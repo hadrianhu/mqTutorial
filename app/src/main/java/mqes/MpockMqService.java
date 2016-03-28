@@ -249,37 +249,15 @@ public class MpockMqService extends Service {
 
 
     // -----------------------------------------KEEP ALIVE ADS.
-	/*
-	 * Schedule the next time that you want the phone to wake up and ping the
-	 * message broker server
-	 */
+
     private void scheduleNextPing() {
         log("scheduleNextPing..METHOD..called");
-        // When the phone is off, the CPU may be stopped. This means that our
-        // code may stop running.
-        // When connecting to the message broker, we specify a 'keep alive'
-        // period - a period after which, if the client has not contacted
-        // the server, even if just with a ping, the connection is considered
-        // broken.
-        // To make sure the CPU is woken at least once during each keep alive
-        // period, we schedule a wake up to manually ping the server
-        // thereby keeping the long-running connection open
-        // Normally when using this Java MQTT client library, this ping would be
-        // handled for us.
-        // Note that this may be called multiple times before the next scheduled
-        // ping has fired. This is good - the previously scheduled one will be
-        // cancelled in favour of this one.
-        // This means if something else happens during the keep alive period,
-        // (e.g. we receive an MQTT message), then we start a new keep alive
-        // period, postponing the next ping.
+
 
         PendingIntent pendingIntent = PendingIntent
                 .getBroadcast(this, 0, new Intent(MQTT_PING_ACTION),
                         PendingIntent.FLAG_UPDATE_CURRENT);
-        // log("scheduleNextPing");
-        // in case it takes us a little while to do this, we try and do it
-        // shortly before the keep alive period expires
-        // it means we're pinging slightly more frequently than necessary
+
         Calendar wakeUpTime = Calendar.getInstance();
         // Calendar.m
         wakeUpTime.add(Calendar.SECOND, keepAlive);
@@ -298,14 +276,7 @@ public class MpockMqService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             log("ppppppppppppppp   Ping Sender broadcast received...");
-            // Note that we don't need a wake lock for this method (even though
-            // it's important that the phone doesn't switch off while we're
-            // doing this).
-            // According to the docs, "Alarm Manager holds a CPU wake lock as
-            // long as the alarm receiver's onReceive() method is executing.
-            // This guarantees that the phone will not sleep until you have
-            // finished handling the broadcast."
-            // This is good enough for our needs.
+
 
             superReconnect();
 
@@ -320,8 +291,6 @@ public class MpockMqService extends Service {
 
         //	if (isOnline()) {
         log(" we are online attempting to reconnect Attempting to reconnect...");
-        // mqttClient.connect();
-        // if (mqttClient.isConnected()) {
 
         if (sampleClient == null) {
             log("sample client is NULL");
@@ -335,20 +304,6 @@ public class MpockMqService extends Service {
                 sampleClient.publish(Globals.heartbeatString, Globals.heartBeatMqQos,
                         userName.getBytes(), Globals.heartbeatString);
 
-//					//CHANGE STATE
-//					log("sample client state before sub:"+MqUtilz.getState(sampleClient.state));
-//					sampleClient.state = sampleClient.CONNECTED;
-//					log("state changed to:"+MqUtilz.getState(sampleClient.state));
-
-                // ATTEMPTY SUBSCRIBE
-                //sampleClient.subscribe(topicList, 2);
-
-                //SUB TO TOPICS
-             //   subToTopics();
-
-
-                //  log("subscribed to:"+Globals.appName+"/everyone/#");
-                // log("subscribed to:"+Globals.appName+"/" + vars.prefs.getString("userId", null)+ "/#");
 
             } catch (MqttException e) {
                 // TODO Auto-generated catch block
@@ -368,15 +323,6 @@ public class MpockMqService extends Service {
                     sampleClient.state = 1;
                     sampleClient.publish(Globals.heartbeatString, Globals.heartBeatMqQos,
                             userName.getBytes(), "memetoxheartbeatnnn");
-
-
-                    //CHECK IS CLIENT HAS puSCRIBED AND IF NOT MAKE IT DO SO
-//                    if(!MySingleton.getInstance(vars.context).clientSubscribed){
-//                        log("client subscribed is FALSE: So we are gonna sub");
-//                        subToTopics();
-//                    }else{
-//                        log("client subscribed is TRUE: So we are gonna do NOTHING");
-//                    }
 
 
                 } catch (MqttPersistenceException e) {
@@ -430,18 +376,6 @@ public class MpockMqService extends Service {
         } else {
             log("uername == null OR CLIENT ID IS ZERO");
         }
-
-        //OLD WAY TO HANDLE THE USERNAME
-//        String clientId = prefs.getString("clientId", "000");
-//        if(vars.clientId != null && clientId != "000"){
-//          //  sub.doSubscribe(Globals.appName + "/"+vars.clientId+"/#", 2);
-//            topicList.add(Globals.appName + "/"+vars.clientId+"/#");
-//            log("vars.clientId was NOT NULL we suscribed");
-//        }else{
-//            log("vars.clientId == null OR CLIENT ID IS ZERO");
-//        }
-
-        //  topicList.add(Globals.appName + "/"+vars.clientId+"/#");
 
 
         for (String t : topicList) {
@@ -499,9 +433,7 @@ public class MpockMqService extends Service {
         @Override
         public void onReceive(Context ctx, Intent intent) {
             log("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnn    ---------NetworkConnectionIntentReceiver");
-            // we protect against the phone switching off while we're doing this
-            // by requesting a wake lock - we request the minimum possible wake
-            // lock - just enough to keep the CPU running until we've finished
+
             PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
             WakeLock wl = pm
                     .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MQTT");
@@ -564,24 +496,6 @@ public class MpockMqService extends Service {
 
         }
 
-        //PROCESS CONTEXT STRING
-        public void processContextString(String contextString) {
-            log("-------------Process String");
-           /* ContextReply cr = vars.gson.fromJson(contextString, ContextReply.class);
-            log("contest object:" + cr.stringId);
-
-            //CHECK TYPE
-            if (cr.challenge) {
-                log("challenge is true");
-
-                //FIND CHALLANGE
-                // Note.find(Note.class, "name = ? and title = ?", "satya", "title1");
-                log("checking for challenge");
-                List<Sendrequestorm> challengeList = Sendrequestorm.find(Sendrequestorm.class, "generatedrequestid = ?", cr.stringId);
-                log("found challenges:" + challengeList.size());
-
-            }*/
-        }
     }
 
 }
