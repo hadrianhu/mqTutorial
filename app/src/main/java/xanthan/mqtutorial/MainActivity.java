@@ -1,5 +1,6 @@
 package xanthan.mqtutorial;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import mqes.MpockMqService;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //START MQ
+        startService(new Intent(this, MpockMqService.class));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
